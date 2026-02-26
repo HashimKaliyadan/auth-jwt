@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../api/axios';
 import { useNavigate, Link } from 'react-router-dom';
+import './Auth.css';
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -25,21 +26,14 @@ const Register = () => {
         setSuccess('');
 
         try {
-            // Hit the Django register endpoint we created in account/urls.py (/api/register/)
             await api.post('register/', formData);
-
-            setSuccess('Registration successful! You can now log in.');
-
-            // Wait 2 seconds then redirect to login
+            setSuccess('Registration successful! Redirecting to login...');
             setTimeout(() => {
                 navigate('/login');
             }, 2000);
-
         } catch (err) {
             console.error('Registration error:', err);
-            // Django usually returns specific field errors
             if (err.response && err.response.data) {
-                // Formatting dictionary error messages into a string
                 const errorMessages = Object.values(err.response.data).flat().join(', ');
                 setError(errorMessages || 'Failed to register. Username might be taken.');
             } else {
@@ -49,56 +43,60 @@ const Register = () => {
     };
 
     return (
-        <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '5px' }}>
-            <h2>Register</h2>
-            {error && <p style={{ color: 'red', marginBottom: '15px' }}>{error}</p>}
-            {success && <p style={{ color: 'green', marginBottom: '15px' }}>{success}</p>}
+        <div className="auth-page">
+            <div className="auth-card">
+                <h2>Create Account</h2>
+                <p className="auth-subtitle">Sign up to get started</p>
 
-            <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Username:</label>
-                    <input
-                        type="text"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%', padding: '8px' }}
-                    />
-                </div>
+                {error && <div className="auth-error">{error}</div>}
+                {success && <div className="auth-success">{success}</div>}
 
-                <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Email:</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%', padding: '8px' }}
-                    />
-                </div>
+                <form onSubmit={handleSubmit}>
+                    <div className="auth-form-group">
+                        <label>Username</label>
+                        <input
+                            type="text"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            placeholder="Choose a username"
+                            required
+                        />
+                    </div>
 
-                <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Password:</label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%', padding: '8px' }}
-                    />
-                </div>
+                    <div className="auth-form-group">
+                        <label>Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="Enter your email"
+                            required
+                        />
+                    </div>
 
-                <button type="submit" style={{ width: '100%', padding: '10px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}>
-                    Register
-                </button>
-            </form>
+                    <div className="auth-form-group">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            placeholder="Create a password"
+                            required
+                        />
+                    </div>
 
-            <p style={{ marginTop: '15px', textAlign: 'center' }}>
-                Already have an account? <Link to="/login">Login here</Link>
-            </p>
+                    <button type="submit" className="auth-btn">
+                        Create Account
+                    </button>
+                </form>
+
+                <p className="auth-footer">
+                    Already have an account? <Link to="/login">Sign in here</Link>
+                </p>
+            </div>
         </div>
     );
 };

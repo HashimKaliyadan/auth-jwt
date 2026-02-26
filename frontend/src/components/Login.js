@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../api/axios';
 import { useNavigate, Link } from 'react-router-dom';
+import './Auth.css';
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -20,14 +21,9 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Send username and password to your Django login endpoint
             const response = await api.post('login/', formData);
-
-            // Save tokens to localStorage
             localStorage.setItem('access', response.data.access);
             localStorage.setItem('refresh', response.data.refresh);
-
-            // Redirect to profile after successful login
             navigate('/profile');
         } catch (err) {
             setError('Invalid credentials. Please try again.');
@@ -35,40 +31,45 @@ const Login = () => {
     };
 
     return (
-        <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '5px' }}>
-            <h2>Login</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Username:</label>
-                    <input
-                        type="text"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%', padding: '8px' }}
-                    />
-                </div>
-                <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Password:</label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%', padding: '8px' }}
-                    />
-                </div>
-                <button type="submit" style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}>
-                    Login
-                </button>
-            </form>
+        <div className="auth-page">
+            <div className="auth-card">
+                <h2>Welcome Back</h2>
+                <p className="auth-subtitle">Sign in to your account</p>
 
-            <p style={{ marginTop: '15px', textAlign: 'center' }}>
-                Don't have an account? <Link to="/register">Register here</Link>
-            </p>
+                {error && <div className="auth-error">{error}</div>}
+
+                <form onSubmit={handleSubmit}>
+                    <div className="auth-form-group">
+                        <label>Username</label>
+                        <input
+                            type="text"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            placeholder="Enter your username"
+                            required
+                        />
+                    </div>
+                    <div className="auth-form-group">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            placeholder="Enter your password"
+                            required
+                        />
+                    </div>
+                    <button type="submit" className="auth-btn">
+                        Sign In
+                    </button>
+                </form>
+
+                <p className="auth-footer">
+                    Don't have an account? <Link to="/register">Register here</Link>
+                </p>
+            </div>
         </div>
     );
 };

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import '../components/Auth.css';
 
 const Profile = () => {
     const [userData, setUserData] = useState(null);
@@ -10,14 +11,11 @@ const Profile = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                // Notice how we don't need to manually pass the token here!
-                // The Axios interceptor handles it.
                 const response = await api.get('profile/');
                 setUserData(response.data);
             } catch (err) {
                 console.error('Error fetching profile', err);
                 setError('Failed to load profile. Please log in again.');
-                // If the token is invalid or expired, clear it and kick them out
                 localStorage.removeItem('access');
                 localStorage.removeItem('refresh');
                 navigate('/login');
@@ -33,20 +31,51 @@ const Profile = () => {
         navigate('/login');
     };
 
-    if (error) return <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>;
-    if (!userData) return <p style={{ textAlign: 'center' }}>Loading profile...</p>;
+    if (error) return <div className="auth-loading"><div className="auth-error">{error}</div></div>;
+    if (!userData) return <div className="auth-loading">Loading profile...</div>;
+
+    // Get initials for the avatar
+    const initials = userData.username ? userData.username.charAt(0) : '?';
 
     return (
-        <div style={{ maxWidth: '600px', margin: '50px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' }}>
-            <h2>Welcome, {userData.username}!</h2>
-            <p><strong>Email:</strong> {userData.email}</p>
-            <p><strong>User ID:</strong> {userData.id}</p>
-            <button
-                onClick={handleLogout}
-                style={{ marginTop: '20px', padding: '10px 15px', backgroundColor: 'red', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
-            >
-                Logout
-            </button>
+        <div className="auth-page">
+            <div className="profile-card">
+                <div className="profile-header">
+                    <div className="profile-avatar">{initials}</div>
+                    <h2>{userData.username}</h2>
+                    <p className="profile-subtitle">Your personal account</p>
+                </div>
+
+                <div className="profile-body">
+                    <div className="profile-info">
+                        <div className="profile-info-row">
+                            <div className="profile-info-icon">👤</div>
+                            <div className="profile-info-content">
+                                <span className="profile-info-label">Username</span>
+                                <span className="profile-info-value">{userData.username}</span>
+                            </div>
+                        </div>
+                        <div className="profile-info-row">
+                            <div className="profile-info-icon">✉️</div>
+                            <div className="profile-info-content">
+                                <span className="profile-info-label">Email</span>
+                                <span className="profile-info-value">{userData.email}</span>
+                            </div>
+                        </div>
+                        <div className="profile-info-row">
+                            <div className="profile-info-icon">🔑</div>
+                            <div className="profile-info-content">
+                                <span className="profile-info-label">User ID</span>
+                                <span className="profile-info-value">{userData.id}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onClick={handleLogout} className="auth-btn auth-btn-danger">
+                        Logout
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };
